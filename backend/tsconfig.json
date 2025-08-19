@@ -1,0 +1,24 @@
+
+{
+  "compilerOptions": {
+    // File Layout
+    "rootDir": "./", 
+    "outDir": "./dist", 
+
+    // Environment Settings
+    "target": "es2022", 
+    "module": "NodeNext", 
+    "lib": ["es2022"], 
+    "types": ["node", "jest"],
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "NodeNext",
+    "strict": true
+  },
+  "include": ["src/**/*","tests/**/*"], // Tells the compiler which files to include.
+  "exclude": ["node_modules", "dist", "**/*.spec.ts"] 
+}
