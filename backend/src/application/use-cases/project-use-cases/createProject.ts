@@ -5,7 +5,6 @@ import {
 } from "../../dto/projectDTO";
 import { Project } from "../../../domain/entities/Project";
 import { randomUUID } from "crypto";
-import { ProjectEntity } from "../../../infrastructure/database/entities/ProjectType";
 
 export class CreateProject {
   constructor(private projectRepo: ProjectRepository) {}
