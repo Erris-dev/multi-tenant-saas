@@ -6,6 +6,7 @@ import { config } from '../config/index';
 import { createConnection } from '../infrastructure/database/PostgreConfig';
 import userRoutes  from '../presentation/routes/authRoutes';
 import projectRoutes from "../presentation/routes/projectRoutes";
+import taskRoutes from "../presentation/routes/taskRoutes";
 
 // Tu e cook applikacionin
 const app = express();
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use('/api/auth', userRoutes);
 app.use('/api/project', projectRoutes);
+app.use('/api/tasks', taskRoutes);
 
 // Ruje portin qtu maspari king
 const PORT = config.server.port;
