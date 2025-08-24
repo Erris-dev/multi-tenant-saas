@@ -1,7 +1,9 @@
-import { Request, Response } from "express";
+import { Request, response, Response } from "express";
 import { PostgreTaskRepo } from "../../infrastructure/repositories/postgreTaskRepo";
 import { CreateTask } from "../../application/use-cases/task-use-cases/createTask";
 import { UpdateTask } from "../../application/use-cases/task-use-cases/updateTask";
+import { GetAllProjectTask } from "../../application/use-cases/task-use-cases/getAllTasks";
+import { GetSinglTask } from "../../application/use-cases/task-use-cases/getSingleTask";
 
 export const createTaskController = async (req: Request, res: Response) => {
   try {
@@ -55,6 +57,41 @@ export const updateTaskController = async (req: Request, res: Response) => {
     res.status(200).json({ message: response });
   } catch (err: any) {
     console.error("Error updating task");
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getAllProjectTaskController = async (req: Request, res: Response) => {
+  try {
+    const taskRepo = new PostgreTaskRepo();
+    const getAllTaskUseCase = new GetAllProjectTask(taskRepo);
+
+    const { projectId } = req.params;
+    const tenantId = (req as any).tenantId;
+
+    const result = await getAllTaskUseCase.execute(projectId, tenantId);
+
+    res.status(200).json({ message: "success", response: result });
+  } catch (err: any) {
+    console.error("Error fetching tasks");
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getSingletTaskController = async (req: Request, res: Response) => {
+  try {
+    const taskRepo = new PostgreTaskRepo();
+    const taskUseCase = new GetSinglTask(taskRepo);
+
+    const  {taskId}  = req.params;
+    const tenantId = (req as any).tenantId;
+
+    const result = await taskUseCase.execute(taskId, tenantId);
+    console.log(result);
+
+    res.status(200).json({ message: "succes", response: result });
+  } catch (err: any) {
+    console.error("Error fetching the task ");
     res.status(500).json({ error: err.message });
   }
 };
