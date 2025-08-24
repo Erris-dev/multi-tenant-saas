@@ -15,6 +15,12 @@ export enum TaskStatus {
   IN_PROGRESS = 'in-progress',
   DONE = 'done',
 }
+export enum TaskPriority {
+  LOW = 'low',
+  MEMDIUM = 'medium',
+  HIGH = 'high'
+}
+
 
 @Entity({ name: 'tasks' })
 export class TaskEntity {
@@ -33,8 +39,9 @@ export class TaskEntity {
   @Column({ type: 'enum', enum: TaskStatus, default: TaskStatus.TODO })
   status!: TaskStatus;
 
-  @Column({ type: 'varchar', length: 50, default: 'medium' })
-  priority!: 'low' | 'medium' | 'high';
+  @Column({ type: 'enum', enum: TaskPriority, default: TaskPriority.LOW })
+  priority!: TaskPriority;
+
 
   @Column({ type: 'date', nullable: true })
   due_date?: Date;
