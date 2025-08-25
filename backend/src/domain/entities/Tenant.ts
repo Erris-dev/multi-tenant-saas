@@ -1,6 +1,6 @@
 export interface TenantProps {
     id: string;
-    subdomain?: string;
+    subdomain: string;
     name?: string;
     createdAt?: Date;
     updatedAt?: Date;
@@ -8,7 +8,7 @@ export interface TenantProps {
 
 export class Tenant {
   public readonly id: string;
-  public readonly subdomain?: string;
+  public readonly subdomain: string;
   public name?: string;             
   public createdAt: Date;
   public updatedAt: Date;

@@ -2,7 +2,7 @@ export interface UserProps {
     id: string;
     email: string;
     fullName: string;
-    passwordHash: string;
+    passwordHash?: string;
     isActive?: boolean;
     tenantId: string;
 }
@@ -11,7 +11,7 @@ export class User {
     public readonly id: string;
     public email: string;
     public fullName: string;
-    private passwordHash: string;
+    private passwordHash?: string;
     public isActive: boolean;
     public tenantId: string;
 
@@ -33,6 +33,8 @@ export class User {
     }
 
     async checkPassword(password: string): Promise<boolean> {
+        if(!this.passwordHash) return false;
+        
         const bcrypt = await import('bcrypt');
         return bcrypt.compare(password, this.passwordHash);
     }
