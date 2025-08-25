@@ -1,0 +1,50 @@
+name: CD - Deploy to Production
+
+on:
+    push:
+        branches:
+            - production
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        permissions:
+            contents: read
+        
+        # This links the job to the 'production' environment, enabling protection rules.
+        environment:
+            name: production
+
+        steps:
+            # Step 1: Use a Google-provided action to authenticate with GCP.
+            # The 'credentials_json' secret is the key file for your service account.
+            - name: 'Authenticate to Google Cloud'
+              id: 'auth'
+              uses: google-github-actions/auth@v2
+              with:
+                  credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+            # Step 2: Use another Google-provided action to set the GCP project ID.
+            # This is cleaner and more robust than using a run script.
+            - name: 'Set GCP project ID'
+              id: 'set-project-id'
+              uses: google-github-actions/set-project@v2
+              with:
+                  image: 'gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-app-repository-name:${{ needs.build.outputs.image_tag }}'
+
+            # Step 3: Deploy the Docker image to Google Cloud Run.
+            # This action handles the 'gcloud run deploy' command for you.
+            - name: 'Deploy to Cloud Run'
+              id: 'deploy'
+              uses: google-github-actions/deploy-cloudrun@v2
+              with:
+                  service: multi-tenant-pmsaas-backend
+                  # Correctly referencing the output variable 'image_tag' from the CI workflow.
+                  image: 'gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-app-repository-name:${{ needs.build-and-push-docker-image.outputs.image_tag }}'
+                  region: europe-west1
+                  metadata: |
+                      annotations:
+                          run.googleapis.com/ingress: all
+                          run.googleapis.com/launch-stage: production
+                          run.googleapis.com/client-name: github-actions-deploy
