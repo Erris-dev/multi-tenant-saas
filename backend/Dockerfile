@@ -2,7 +2,7 @@
 
 FROM node:20-alpine AS builder
 
-WORKDIR /backend
+WORKDIR /app
 
 COPY package.json package-lock.json ./
 
@@ -16,11 +16,11 @@ RUN npm run build
 
 FROM node:20-alpine
 
-WORKDIR /backend
+WORKDIR /app
 
-COPY --from=builder /backend/dist ./dist
-COPY --from=builder /backend/package.json ./
-COPY --from=builder /backend/package-lock.json ./
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /application/package.json ./
+COPY --from=builder /application/package-lock.json ./
 
 EXPOSE 6969
 
