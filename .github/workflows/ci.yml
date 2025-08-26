@@ -28,11 +28,7 @@ jobs:
         
       - name: Install Dependencies
         working-directory: ./backend
-        run: npm install
-
-      - name: Print ID token
-        run: |
-          echo "ID_TOKEN=$ACTIONS_ID_TOKEN" 
+        run: npm install 
 
       - name: Authenticate to Google Cloud
         id: auth
