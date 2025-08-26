@@ -31,18 +31,24 @@ jobs:
         run: npm install
 
       - name: Authenticate to Google Cloud
+        id: auth
         uses: google-github-actions/auth@v2
         with:
           token_format: access_token
-          workload_identity_provider: projects/87458775841/locations/global/workloadIdentityPools/my-pool/providers/github-provider
-          service_account: ci-cd-sa@multi-tenant-saas-470216.iam.gserviceaccount.com
+          workload_identity_provider: projects/1096375043635/locations/global/workloadIdentityPools/ghpool/providers/github-provider
+          service_account: gha-cloudrun-deployer@multi-tenant-saas-deploy.iam.gserviceaccount.com
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: multi-tenant-saas-deploy
 
       - name: Configure Docker for Google Cloud
-        run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+        run: gcloud auth configure-docker us-cental1-docker.pkg.dev --quiet
 
       - name: Build and Push Docker Image
         run: |
-          IMAGE=europe-west1-docker.pkg.dev/multi-tenant-saas-470216/multi-Tenant-PMSaaS/backend:${{ github.sha }}
+          IMAGE=us-central1-docker.pkg.dev/multi-tenant-saas-deploy/multi-Tenant-PMSaaS/backend:${{ github.sha }}
           docker build -t $IMAGE ./backend
           docker push $IMAGE
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
