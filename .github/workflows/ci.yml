@@ -30,6 +30,10 @@ jobs:
         working-directory: ./backend
         run: npm install
 
+      - name: Print ID token
+        run: |
+          echo "ID_TOKEN=$ACTIONS_ID_TOKEN" 
+
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v2
