@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: 20
         
-          
+
       - name: Install Dependencies
         working-directory: ./backend
         run: npm install 
@@ -35,7 +35,6 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v2
         with:
-          token_format: access_token
           workload_identity_provider: projects/1096375043635/locations/global/workloadIdentityPools/ghpool/providers/github-provider
           service_account: gha-cloudrun-deployer@multi-tenant-saas-deploy.iam.gserviceaccount.com
 
