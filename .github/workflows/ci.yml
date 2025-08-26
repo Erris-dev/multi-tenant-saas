@@ -36,4 +36,4 @@ jobs:
           context: ./backend
           push: true
           # The key change is here: we tag the image with the commit SHA
-          tags: gcr.io/${{ secrets.GCP_PROJECT_ID }}/multi-Tenant-PMSaaS:${{ github.sha }}
+          tags: gcr.io/${{ secrets.GCP_PROJECT_ID }}/multi-tenant-pmsaas:${{ github.sha }}
