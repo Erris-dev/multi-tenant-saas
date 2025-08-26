@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - develop
+      - production
+  pull_request:
+    branches:
+      - develop
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+        
+      - name: Install Dependencies
+        working-directory: ./backend
+        run: npm install
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: access_token
+          workload_identity_provider: projects/1096375043635/locations/global/workloadIdentityPools/ghpool/providers/github-provider
+          service_account: gha-cloudrun-deployer@multi-tenant-saas-deploy.iam.gserviceaccount.com
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: multi-tenant-saas-deploy
+
+      - name: Configure Docker for Google Cloud
+        run: gcloud auth configure-docker us-cental1-docker.pkg.dev --quiet
+
+      - name: Build and Push Docker Image
+        run: |
+          IMAGE=us-central1-docker.pkg.dev/multi-tenant-saas-deploy/multi-Tenant-PMSaaS/backend:${{ github.sha }}
+          docker build -t $IMAGE ./backend
+          docker push $IMAGE
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
