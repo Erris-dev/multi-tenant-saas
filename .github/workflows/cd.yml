@@ -31,7 +31,7 @@ jobs:
               id: 'set-project-id'
               uses: google-github-actions/set-project@v2
               with:
-                  image: 'gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-app-repository-name:${{ needs.build.outputs.image_tag }}'
+                  image: 'gcr.io/${{ secrets.GCP_PROJECT_ID }}/Multi-Tenant-PMSaaS:${{ needs.build.outputs.image_tag }}'
 
             # Step 3: Deploy the Docker image to Google Cloud Run.
             # This action handles the 'gcloud run deploy' command for you.
@@ -41,7 +41,7 @@ jobs:
               with:
                   service: multi-tenant-pmsaas-backend
                   # Correctly referencing the output variable 'image_tag' from the CI workflow.
-                  image: 'gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-app-repository-name:${{ needs.build-and-push-docker-image.outputs.image_tag }}'
+                  image: 'gcr.io/${{ secrets.GCP_PROJECT_ID }}/Multi-Tenant-PMSaaS:${{ needs.build-and-push-docker-image.outputs.image_tag }}'
                   region: europe-west1
                   metadata: |
                       annotations:
