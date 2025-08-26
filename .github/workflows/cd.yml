@@ -1,4 +1,4 @@
-name: CD - Deploy to Production
+name: CD - Docker Deploy to Production (GCP)
 
 on:
     push:
@@ -12,13 +12,11 @@ jobs:
         permissions:
             contents: read
         
-        # This links the job to the 'production' environment, enabling protection rules.
         environment:
             name: production
 
         steps:
             # Step 1: Use a Google-provided action to authenticate with GCP.
-            # The 'credentials_json' secret is the key file for your service account.
             - name: 'Authenticate to Google Cloud'
               id: 'auth'
               uses: google-github-actions/auth@v2
@@ -31,7 +29,7 @@ jobs:
               id: 'set-project-id'
               uses: google-github-actions/set-project@v2
               with:
-                  image: 'gcr.io/${{ secrets.GCP_PROJECT_ID }}/multi-tenant-pmsaas:${{ needs.build.outputs.image_tag }}'
+                  project_id: ${{ secrets.GCP_PROJECT_ID }}
 
             # Step 3: Deploy the Docker image to Google Cloud Run.
             # This action handles the 'gcloud run deploy' command for you.
@@ -40,8 +38,9 @@ jobs:
               uses: google-github-actions/deploy-cloudrun@v2
               with:
                   service: multi-tenant-pmsaas-backend
-                  # Correctly referencing the output variable 'image_tag' from the CI workflow.
-                  image: 'gcr.io/${{ secrets.GCP_PROJECT_ID }}/multi-tenant-pmsaas:${{ needs.build-and-push-docker-image.outputs.image_tag }}'
+                  # This is the corrected image path. It uses the commit SHA to
+                  # reference the exact image built for this specific commit.
+                  image: 'europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/multi-tenant-pmsaas:${{ github.sha }}'
                   region: europe-west1
                   metadata: |
                       annotations:
