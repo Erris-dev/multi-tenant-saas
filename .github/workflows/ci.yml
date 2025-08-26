@@ -37,6 +37,7 @@ jobs:
           token_format: access_token
           workload_identity_provider: projects/87458775841/locations/global/workloadIdentityPools/my-pool/providers/github-provider
           service_account: ci-cd-sa@multi-tenant-saas-470216.iam.gserviceaccount.com
+          audience: 87458775841
 
       - name: Configure Docker for Google Cloud
         run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
