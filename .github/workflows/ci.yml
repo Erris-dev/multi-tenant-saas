@@ -6,7 +6,7 @@ on:
   push:
     branches:
       - develop
-      - production  
+      - production
   pull_request:
     branches:
       - develop
@@ -20,20 +20,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Log in to a container registry
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+      # Step 2: Authenticate to Google Cloud
+      - name: 'Authenticate to Google Cloud'
+        id: 'auth'
+        uses: google-github-actions/auth@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+            credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      # Step 3: Set up build metadata.
-      # We explicitly tag the image with the commit's unique SHA.
-      # This ensures the CD pipeline can find the exact image that was built and tested.
+      # Step 3: Configure Docker to use gcloud credential helper
+      - name: 'Set up Cloud SDK'
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      # Step 4: Build and push the Docker image
       - name: Build and push Docker image
+        id: image_build
         uses: docker/build-push-action@v5
         with:
           context: ./backend
           push: true
-          # The key change is here: we tag the image with the commit SHA
+          # The key change is here: we use the fully qualified, region-specific registry name
           tags: europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/multi-tenant-pmsaas:${{ github.sha }}
