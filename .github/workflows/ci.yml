@@ -31,6 +31,12 @@ jobs:
         working-directory: ./backend
         run: npm install 
 
+      - name: Inspect GitHub OIDC token
+        run: |
+         echo "ID Token:"
+         echo $ACTIONS_ID_TOKEN | base64 --decode | jq .
+
+
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v2
@@ -44,11 +50,11 @@ jobs:
           project_id: multi-tenant-saas-deploy
 
       - name: Configure Docker for Google Cloud
-        run: gcloud auth configure-docker us-cental1-docker.pkg.dev --quiet
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
       - name: Build and Push Docker Image
         run: |
-          IMAGE=us-central1-docker.pkg.dev/multi-tenant-saas-deploy/multi-Tenant-PMSaaS/backend:${{ github.sha }}
+          IMAGE=us-central1-docker.pkg.dev/multi-tenant-saas-deploy/multi-tenant-pmsaas/backend:${{ github.sha }}
           docker build -t $IMAGE ./backend
           docker push $IMAGE
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
