@@ -25,16 +25,19 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20
+
+      - name: Inspect GitHub OIDC token
+        run: |
+         run: |
+          echo "ID Token:"
+          echo $ACTIONS_ID_TOKEN
+          echo "Decoded ID Token claims:"
+          echo $ACTIONS_ID_TOKEN | base64 --decode | jq .
         
 
       - name: Install Dependencies
         working-directory: ./backend
         run: npm install 
-
-      - name: Inspect GitHub OIDC token
-        run: |
-         echo "ID Token:"
-         echo $ACTIONS_ID_TOKEN | base64 --decode | jq .
 
 
       - name: Authenticate to Google Cloud
