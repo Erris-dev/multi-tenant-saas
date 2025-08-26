@@ -1,44 +1,45 @@
-# The name of this workflow as it appears in the GitHub Actions tab
-name: CI - Docker Build and Test
+name: CI
 
-# This workflow is triggered on a push to the specified branches
 on:
   push:
     branches:
       - develop
-      - production
   pull_request:
     branches:
       - develop
 
 jobs:
-  build-and-test-docker-image:
+  test-and-build:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the repository code
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Step 2: Authenticate to Google Cloud
-      - name: 'Authenticate to Google Cloud'
-        id: 'auth'
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+        
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Tests
+        run: npm run test:ci
+
+      - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-            credentials_json: ${{ secrets.GCP_SA_KEY }}
+          token_format: access_token
+          workload_identity_provider: projects/87458775841/locations/global/workloadIdentityPools/my-pool/providers/github-provider
+          service_account: ci-cd-sa@multi-tenant-saas-470216.iam.gserviceaccount.com
 
-      # Step 3: Configure Docker to use gcloud credential helper
-      - name: 'Set up Cloud SDK'
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+      - name: Configure Docker for Google Cloud
+        run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
 
-      # Step 4: Build and push the Docker image
-      - name: Build and push Docker image
-        id: image_build
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend
-          push: true
-          # The key change is here: we use the fully qualified, region-specific registry name
-          tags: europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/multi-tenant-pmsaas:${{ github.sha }}
+      - name: Build and Push Docker Image
+        run: |
+          IMAGE=europe-west1-docker.pkg.dev/multi-tenant-saas-470216/multi-Tenant-PMSaaS/backend:${{ github.sha }}
+          docker build -t $IMAGE ./backend
+          docker push $IMAGE
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV

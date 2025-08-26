@@ -1,49 +1,35 @@
-name: CD - Docker Deploy to Production (GCP)
+name: CD
 
 on:
-    push:
-        branches:
-            - production
+  push:
+    branches:
+      - production
 
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest
 
-        permissions:
-            contents: read
-        
-        environment:
-            name: production
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-        steps:
-            # Step 1: Use a Google-provided action to authenticate with GCP.
-            - name: 'Authenticate to Google Cloud'
-              id: 'auth'
-              uses: google-github-actions/auth@v2
-              with:
-                  credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: access_token
+          workload_identity_provider: projects/87458775841/locations/global/workloadIdentityPools/my-pool/providers/github-provider
+          service_account: ci-cd-sa@multi-tenant-saas-470216.iam.gserviceaccount.com
 
-            # Step 2: Use another Google-provided action to set the GCP project ID.
-            # This is cleaner and more robust than using a run script.
-            - name: 'Set GCP project ID'
-              id: 'set-project-id'
-              uses: google-github-actions/set-project@v2
-              with:
-                  project_id: ${{ secrets.GCP_PROJECT_ID }}
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: multi-tenant-saas-470216
 
-            # Step 3: Deploy the Docker image to Google Cloud Run.
-            # This action handles the 'gcloud run deploy' command for you.
-            - name: 'Deploy to Cloud Run'
-              id: 'deploy'
-              uses: google-github-actions/deploy-cloudrun@v2
-              with:
-                  service: multi-tenant-pmsaas-backend
-                  # This is the corrected image path. It uses the commit SHA to
-                  # reference the exact image built for this specific commit.
-                  image: 'europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/multi-tenant-pmsaas:${{ github.sha }}'
-                  region: europe-west1
-                  metadata: |
-                      annotations:
-                          run.googleapis.com/ingress: all
-                          run.googleapis.com/launch-stage: production
-                          run.googleapis.com/client-name: github-actions-deploy
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy multi-tenant-pmsaas-backend \
+            --image=europe-west1-docker.pkg.dev/multi-tenant-saas-470216/multi-Tenant-PMSaaS/backend:${{ github.sha }} \
+            --region=europe-west1 \
+            --platform=managed \
+            --allow-unauthenticated \
+            --set-env-vars NODE_ENV=production
