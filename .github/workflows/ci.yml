@@ -28,7 +28,6 @@ jobs:
 
       - name: Inspect GitHub OIDC token
         run: |
-         run: |
           echo "ID Token:"
           echo $ACTIONS_ID_TOKEN
           echo "Decoded ID Token claims:"
