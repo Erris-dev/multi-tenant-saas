@@ -9,6 +9,10 @@ on:
     branches:
       - develop
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
