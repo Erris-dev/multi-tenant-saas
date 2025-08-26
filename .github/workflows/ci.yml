@@ -23,9 +23,11 @@ jobs:
           node-version: 20
         
       - name: Install Dependencies
+        working-directory: ./backend
         run: npm install
 
       - name: Run Tests
+        working-directory: ./backend
         run: npm run test:ci
 
       - name: Authenticate to Google Cloud
