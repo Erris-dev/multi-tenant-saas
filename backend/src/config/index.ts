@@ -14,5 +14,10 @@ export const config = {
     },
     jwt: {
         secret: process.env.JWT_SECRET
+    },
+    google: {
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        redirectUri: process.env.REDIRECT_URI
     }
 }

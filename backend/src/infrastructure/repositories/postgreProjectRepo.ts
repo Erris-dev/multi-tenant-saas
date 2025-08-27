@@ -23,16 +23,17 @@ export class PostgreProjectRepo implements ProjectRepository {
     return this.toDomain(entity);   
   }
 
-  async findAll(): Promise<Project[]> {
-    const entities = await this.ormRepo.find();
-    return entities.map(entity => this.toDomain(entity));
+  async findASingleProjectOfUser(projectId: string, tenantId: string): Promise<Project | null> {
+    const entity = await this.ormRepo.findOne({ where: { id: projectId , tenant: { id: tenantId } }, relations: ['tenant', 'createdBy', 'tasks']});
+    if(!entity) return null;
+    return this.toDomain(entity);
   }
 
-  async findAllByUserId(userId: string): Promise<Project[]> {
-    const entities = await this.ormRepo.findBy({ createdBy: { id: userId} });
+  async findAllProjectOfUser(userId: string, tenantId: string): Promise<Project[]> {
+    const entities = await this.ormRepo.find({ where: { createdBy: { id: userId }, tenant: { id: tenantId } }, relations: ['tenant', 'createdBy', 'tasks']});
     return entities.map(entity => this.toDomain(entity));
   }
-
+  
   async save(project: Project): Promise<Project> {
     const entity = await this.ormRepo.save(this.toEntity(project));
     return this.toDomain(entity);

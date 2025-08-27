@@ -1,9 +1,12 @@
 import { Router } from "express";
-import { registerUserController, loginUserController } from "../controllers/authController";
+import { registerUserController, loginUserController, googleAuthController, googleAuthCallbackController } from "../controllers/authController";
+import { authLimiter } from "../middleware/rateLimiter";
 
 const router = Router();
 
-router.post("/register", registerUserController);
-router.post("/login", loginUserController);
+router.get("/google/callback", googleAuthCallbackController);
+router.post("/register", authLimiter, registerUserController);
+router.post("/login", authLimiter, loginUserController);
+router.post("/google-auth", authLimiter, googleAuthController);
 
 export default router;

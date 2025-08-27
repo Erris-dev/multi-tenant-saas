@@ -17,8 +17,15 @@ export class PostgreTaskRepo implements TaskRepository {
         return this.toDomain(entity);
     }
 
-    async findAll(): Promise<Task[]> {
-        const entities = await this.ormRepo.find();
+    async findASingleTask(taskId: string, tenantId: string): Promise<Task | null> {
+        const entity = await this.ormRepo.findOne({ where: { id: taskId, tenant: { id: tenantId} },relations: ['project', 'tenant', 'assignee']});
+        console.log(entity);
+        if(!entity) return null;
+        return this.toDomain(entity);
+    }
+
+    async findAllTasksInProject(projectId: string, tenantId: string): Promise<Task[]> {
+        const entities = await this.ormRepo.find({ where: { project: { id: projectId }, tenant: { id: tenantId }}, relations: ['project', 'tenant', 'assignee']});
         return entities.map(entity => this.toDomain(entity));
     }
 
