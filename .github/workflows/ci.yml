@@ -30,6 +30,9 @@ jobs:
         working-directory: ./backend
         run: npm install 
 
+      - name: Hello World Action
+        uses: actions/hello-world-javascript-action@v1
+
 
       - name: Authenticate to Google Cloud
         id: auth
