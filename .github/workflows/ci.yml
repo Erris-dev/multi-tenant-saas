@@ -3,11 +3,11 @@ name: CI
 on:
   push:
     branches:
-      - develop
+      - development
       - production
   pull_request:
     branches:
-      - develop
+      - development
 
 permissions:
   contents: read
@@ -51,7 +51,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          IMAGE=europe-west1-docker.pkg.dev/msaas-470316/multi-tenant-pmsaas/backend:${{ github.sha }}
+          IMAGE=europe-west1-docker.pkg.dev/msaas-470316/multi-tenant-saas/backend:${{ github.sha }}
           docker build -t $IMAGE ./backend
           docker push $IMAGE
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
