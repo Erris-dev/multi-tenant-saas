@@ -25,15 +25,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20
-
-      - name: Inspect GitHub OIDC token
-        run: |
-          echo "ID Token:"
-          echo $ACTIONS_ID_TOKEN
-          echo "Decoded ID Token claims:"
-          echo $ACTIONS_ID_TOKEN | base64 --decode | jq .
         
-
       - name: Install Dependencies
         working-directory: ./backend
         run: npm install 
@@ -43,20 +35,20 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: projects/1096375043635/locations/global/workloadIdentityPools/ghpool/providers/github-provider
-          service_account: gha-cloudrun-deployer@multi-tenant-saas-deploy.iam.gserviceaccount.com
+          workload_identity_provider: projects/460674569272/locations/global/workloadIdentityPools/cloud-pool/providers/github-provider 
+          service_account: gha-cloudrun-deployer@msaas-470316.iam.gserviceaccount.com
 
       - name: Set up gcloud CLI
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: multi-tenant-saas-deploy
+          project_id: msaas-470316
 
       - name: Configure Docker for Google Cloud
-        run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+        run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
 
       - name: Build and Push Docker Image
         run: |
-          IMAGE=us-central1-docker.pkg.dev/multi-tenant-saas-deploy/multi-tenant-pmsaas/backend:${{ github.sha }}
+          IMAGE=europe-west1-docker.pkg.dev/msaas-470316/multi-tenant-pmsaas/backend:${{ github.sha }}
           docker build -t $IMAGE ./backend
           docker push $IMAGE
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
