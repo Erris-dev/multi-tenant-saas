@@ -28,7 +28,7 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
-          IMAGE="europe-west1-docker.pkg.dev/msaas-470316/multi-tenant-saas/backend:${{ github.sha }}"
+          IMAGE="europe-west1-docker.pkg.dev/msaas-470316/repo/backend:${{ github.sha }}"
           gcloud run deploy backend \
             --image=$IMAGE \
             --platform=managed \
