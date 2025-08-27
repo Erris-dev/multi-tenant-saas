@@ -3,33 +3,34 @@ name: CD
 on:
   push:
     branches:
-      - production
+      - production  
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          token_format: access_token
-          workload_identity_provider: projects/87458775841/locations/global/workloadIdentityPools/my-pool/providers/github-provider
-          service_account: ci-cd-sa@multi-tenant-saas-470216.iam.gserviceaccount.com
+          workload_identity_provider: "projects/460674569272/locations/global/workloadIdentityPools/cloud-pool/providers/github-provider"
+          service_account: "gha-cloudrun-deployer@msaas-470316.iam.gserviceaccount.com"
 
-      - name: Set up gcloud CLI
+      - name: Set up gcloud
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: multi-tenant-saas-470216
+          project_id: msaas-470316
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy multi-tenant-pmsaas-backend \
-            --image=europe-west1-docker.pkg.dev/multi-tenant-saas-470216/multi-Tenant-PMSaaS/backend:${{ github.sha }} \
-            --region=europe-west1 \
+          IMAGE="europe-west1-docker.pkg.dev/msaas-470316/repo/backend:${{ github.sha }}"
+          gcloud run deploy backend \
+            --image=$IMAGE \
             --platform=managed \
-            --allow-unauthenticated \
-            --set-env-vars NODE_ENV=production
+            --region=europe-west1 \
+            --allow-unauthenticated
